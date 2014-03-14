@@ -41,7 +41,7 @@ class CentralUI : public Wt::WContainerWidget {
     Wt::WPushButton     *createReport;
     /*Обработчик словаря*/
     Wt::WStackedWidget  *opDocks;
-    DictionaryFiller           *mapFiller;
+    DictionaryFiller    *dictFiller;
     
 public:
     CentralUI(Wt::WContainerWidget* parent = 0);

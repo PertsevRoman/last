@@ -10,7 +10,8 @@
 #include "YandexImageAPI.h"
 
 YandexImageAPI::YandexImageAPI() : ImageAPI() {
-    client = new Wt::Http::Client();
+    client      = new Wt::Http::Client();
+    parser      = new htmlcxx::HTML::ParserDom();
 }
 
 YandexImageAPI::YandexImageAPI(const YandexImageAPI& orig) {
@@ -18,6 +19,7 @@ YandexImageAPI::YandexImageAPI(const YandexImageAPI& orig) {
 
 YandexImageAPI::~YandexImageAPI() {
     delete client;
+    delete parser;
 }
 
 void YandexImageAPI::analyse(boost::system::error_code err, const Wt::Http::Message& response) {
@@ -25,28 +27,51 @@ void YandexImageAPI::analyse(boost::system::error_code err, const Wt::Http::Mess
         cache.clear();
     }
     
-    /*Работа с файлом*/
-    std::ofstream f;
-    f.open("out.txt");
-    
-    f << "Start request. Code: " << response.status() << std::endl;
-    
     if(response.status() == 200 || response.status() == 304) {
         cache = response.body();
         
-        f << cache;
+        std::vector<std::string> vec = YandexImageAPI::extractUsers(cache);
         
         extractTags();
         extractImageLink();
     } else {
         cache = std::string();
-        f << "Error: " << err.message() << std::endl;
     }
-    
-    f.close();
 }
 
 void YandexImageAPI::extractTags() {
+}
+
+std::vector<std::string> YandexImageAPI::extractUsers(const std::string& dom) {
+    std::vector<std::string> result;
+    
+    tree<htmlcxx::HTML::Node> domNode = parser->parseTree(dom);
+    
+    tree<htmlcxx::HTML::Node>::iterator it      = domNode.begin();
+    tree<htmlcxx::HTML::Node>::iterator end     = domNode.end();
+    
+    for(; it != end; ++it) {
+        if(it->tagName() == "a") {
+            it->parseAttributes();
+            
+            if(it->attribute("class").first && it->attribute("class").second == "b-user__link") {
+                std::string href = it->attribute("href").second;
+                
+                boost::regex    ex("http://fotki.yandex.ru/users/([a-z0-9]+)/");
+                boost::smatch   cutRes;
+                
+                std::string::const_iterator start       = href.begin();
+                std::string::const_iterator end         = href.end();
+                
+                while(boost::regex_search(start, end, cutRes, ex)) {
+                    result.push_back(cutRes[1]);
+                    start = cutRes[1].second;
+                }
+            }
+        }
+    }
+    
+    return result;
 }
 
 void YandexImageAPI::extractImageLink() {
@@ -55,7 +80,7 @@ void YandexImageAPI::extractImageLink() {
 void YandexImageAPI::request() {
     client->done().connect(this, &YandexImageAPI::analyse);
     client->setTimeout(30);
-    client->get("http://fotki.yandex.ru/search.xml?text=лимон");
+    client->get("http://fotki.yandex.ru/search.xml?text=" + tag);
 }
 
 void YandexImageAPI::request(const std::string& tag) {

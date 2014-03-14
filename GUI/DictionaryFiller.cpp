@@ -40,7 +40,7 @@ void DictionaryFiller::sets() {
     
     markSlider->setRange(0, 10);
     
-    ya->setTag("яблоко");
+    ya->setTag("танк");
     
     send->clicked().connect(this, &DictionaryFiller::startYA);
 }

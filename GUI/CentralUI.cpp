@@ -35,7 +35,7 @@ void CentralUI::init() {
     createReport        = new Wt::WPushButton(RU("Создание отчета"));
     
     opDocks             = new Wt::WStackedWidget();
-    mapFiller           = new DictionaryFiller();
+    dictFiller          = new DictionaryFiller();
 }
 
 void CentralUI::sets() {
@@ -67,7 +67,7 @@ void CentralUI::sets() {
     infSphereTools->addButton(search);
     infSphereTools->addButton(createReport);
     
-    opDocks->addWidget(mapFiller);
+    opDocks->addWidget(dictFiller);
     opDocks->setCurrentIndex(0);
     
     lay->setRowStretch(1, 1);

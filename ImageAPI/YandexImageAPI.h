@@ -19,12 +19,18 @@
 #include <fstream>
 
 #include <boost/system/error_code.hpp>
+#include <boost/regex.hpp>
+#include <boost/foreach.hpp>
+
+#include <htmlcxx/html/ParserDom.h>
 
 #include "ImageAPI.h"
 
 class YandexImageAPI : public ImageAPI {
-    std::string         cache;
-    Wt::Http::Client    *client;
+    std::string                 cache;
+    Wt::Http::Client            *client;
+    
+    htmlcxx::HTML::ParserDom    *parser;
     
 public:
     YandexImageAPI();
@@ -41,6 +47,7 @@ private:
     void analyse(boost::system::error_code err, const Wt::Http::Message& response);
     void extractTags();
     void extractImageLink();
+    std::vector<std::string> extractUsers(const std::string& dom);
 };
 
 #endif	/* YANDEXIMAGEAPI_H */
