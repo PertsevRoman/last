@@ -57,18 +57,8 @@ void YandexImageAPI::analyseAPIAnswer(boost::system::error_code err, const Wt::H
         boost::random::uniform_int_distribution<> dist(0, entries.size() - 1);
         cache = entries.at(dist(gen));
         
-        extractTags();   
-        
-        std::ofstream s;
-        s.open("out.txt");
-        
-        BOOST_FOREACH(std::string my_tag, tags) {
-            s << my_tag << std::endl;
-        }
-        
+        extractTags();
         extractImageLink();
-        
-        s.close();
     } else {
         cache = std::string();
     }
@@ -153,14 +143,12 @@ void YandexImageAPI::extractImageLink() {
     tree<htmlcxx::HTML::Node>::iterator end     = domNode.end();
     
     for(; it != end; ++it) {
-        if(it->tagName() == "f:img") {
+        if(it->tagName() == "content") {
             it->parseAttributes();
             
-            if(it->attribute("size").first && it->attribute("size").second == "orig") {
-                if(it->attribute("href").first) {
-                    imageURL = it->attribute("href").second;
-                    break;
-                }
+            if(it->attribute("src").first) {
+                imageURL = it->attribute("src").second;
+                break;
             }
         }
     }
