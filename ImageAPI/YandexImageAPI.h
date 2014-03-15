@@ -24,6 +24,7 @@
 #include <boost/foreach.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
+#include <boost/signals.hpp>
 
 #include <htmlcxx/html/ParserDom.h>
 
@@ -54,6 +55,9 @@ public:
     
     std::vector<std::string> getTags();
     std::string getImageLink();
+    
+    boost::signal<void ()> requestCompleted;
+    boost::signal<void ()> requestFailed;
     
     bool onOperating();
     

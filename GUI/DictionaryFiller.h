@@ -17,6 +17,16 @@
 #include <Wt/WImage>
 #include <Wt/WText>
 #include <Wt/WPushButton>
+#include <Wt/WMessageBox>
+#include <Wt/WAnimation>
+
+#include <boost/foreach.hpp>
+#include <boost/bind.hpp>
+
+#include <functional>
+#include <iostream>
+#include <fstream>
+#include <vector>
 
 #include "../ImageAPI/YandexImageAPI.h"
 
@@ -39,6 +49,8 @@ private:
     void init();
     void sets();
     void startYA();
+    
+    void setPhoto();
 };
 
 #endif	/* MAPFILLER_H */

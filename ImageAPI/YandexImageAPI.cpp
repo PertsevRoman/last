@@ -30,12 +30,17 @@ void YandexImageAPI::analysePublicAnswer(boost::system::error_code err, const Wt
         cache = response.body();
         
         std::vector<std::string> vec = extractUsers();
-        if(vec.size() > 0) {
+        if(vec.size()) {
             boost::random::uniform_int_distribution<> dist(0, vec.size() - 1);
             std::string lucky = vec.at(dist(gen));
             apiClient->get("http://api-fotki.yandex.ru/api/users/" + lucky + "/tag/" + tag + "/photos/");
+        } else {
+            this->requestFailed();
+            operating = false;
         }
     } else {
+        this->requestFailed();
+        operating = false;
         cache = std::string();
     }
 }
@@ -54,12 +59,21 @@ void YandexImageAPI::analyseAPIAnswer(boost::system::error_code err, const Wt::H
         
         std::vector<std::string> entries = getEntries(cache);
         
-        boost::random::uniform_int_distribution<> dist(0, entries.size() - 1);
-        cache = entries.at(dist(gen));
-        
-        extractTags();
-        extractImageLink();
+        if(entries.size()) {
+            boost::random::uniform_int_distribution<> dist(0, entries.size() - 1);
+            cache = entries.at(dist(gen));
+
+            extractTags();
+            extractImageLink();
+
+            this->requestCompleted();
+        } else {
+            this->requestFailed();
+            operating = false;
+        }
     } else {
+        this->requestFailed();
+        operating = false;
         cache = std::string();
     }
     
@@ -171,6 +185,8 @@ void YandexImageAPI::sets() {
     
     apiClient->done().connect(this, &YandexImageAPI::analyseAPIAnswer);
     apiClient->setTimeout(30);
+    
+    operating = false;
 }
 
 void YandexImageAPI::request(const std::string& tag) {
@@ -179,13 +195,9 @@ void YandexImageAPI::request(const std::string& tag) {
 }
 
 std::string YandexImageAPI::getImageLink() {
-    std::string res;
-    
-    return res;
+    return imageURL;
 }
 
 std::vector<std::string> YandexImageAPI::getTags() {
-    std::vector<std::string> res;
-    
-    return res;
+    return tags;
 }

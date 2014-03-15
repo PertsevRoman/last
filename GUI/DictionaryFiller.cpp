@@ -20,7 +20,7 @@ DictionaryFiller::~DictionaryFiller() {
 void DictionaryFiller::init() {
     header      = new Wt::WText(RU("Оценка тональности лексических единиц"));
     lay         = new Wt::WGridLayout();
-    image       = new Wt::WImage();
+    image       = new Wt::WImage("http://img-fotki.yandex.ru/get/9060/76283034.30/0_a538a_3ddd5946_orig");
     markSlider  = new Wt::WSlider(Wt::Vertical);
     send        = new Wt::WPushButton(RU("Оценить"));
     
@@ -40,11 +40,38 @@ void DictionaryFiller::sets() {
     
     markSlider->setRange(0, 10);
     
-    ya->setTag("танк");
+    ya->setTag("цветы");
     
     send->clicked().connect(this, &DictionaryFiller::startYA);
+    
+    ya->requestCompleted.connect(boost::bind(&DictionaryFiller::setPhoto, this));
+    ya->requestFailed.connect(std::bind([=]() {
+        Wt::WMessageBox *box = new Wt::WMessageBox(RU("Ошибка"), RU("Во время запроса произошла ошибка. Что-то пошло не так"), Wt::Critical, Wt::Ok);
+        
+        box->buttonClicked().connect(std::bind([=]() {
+            delete box;
+        }));
+        
+        box->setModal(true);
+        box->show();
+    }));
+}
+
+void DictionaryFiller::setPhoto() {
+    Wt::WAnimation anim(Wt::WAnimation::Fade);
+    image->animateHide(anim);
+    image->setImageLink(Wt::WLink(ya->getImageLink()));
+    image->imageLoaded().connect(std::bind([=]() {
+        send->setEnabled(true);
+        image->animateShow(anim);
+    }));
+    image->refresh();
+    
 }
 
 void DictionaryFiller::startYA() {
-    ya->request();
+    if(!ya->onOperating()) {
+        ya->request();
+        send->setDisabled(true);
+    }
 }
