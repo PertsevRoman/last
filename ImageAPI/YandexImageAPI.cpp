@@ -35,11 +35,11 @@ void YandexImageAPI::analysePublicAnswer(boost::system::error_code err, const Wt
             std::string lucky = vec.at(dist(gen));
             apiClient->get("http://api-fotki.yandex.ru/api/users/" + lucky + "/tag/" + tag + "/photos/");
         } else {
-            this->requestFailed();
+            this->requestFailed("Не удалось извлечь имена пользователей");
             operating = false;
         }
     } else {
-        this->requestFailed();
+        this->requestFailed("Не прошел запрос к публичной части");
         operating = false;
         cache = std::string();
     }
@@ -68,11 +68,11 @@ void YandexImageAPI::analyseAPIAnswer(boost::system::error_code err, const Wt::H
 
             this->requestCompleted();
         } else {
-            this->requestFailed();
+            this->requestFailed("Не удалось извлечь набор entrie-тегов");
             operating = false;
         }
     } else {
-        this->requestFailed();
+        this->requestFailed("Не прошел запрос к API");
         operating = false;
         cache = std::string();
     }

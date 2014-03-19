@@ -57,7 +57,7 @@ public:
     std::string getImageLink();
     
     boost::signal<void ()> requestCompleted;
-    boost::signal<void ()> requestFailed;
+    boost::signal<void (std::string errMsg)> requestFailed;
     
     bool onOperating();
     
