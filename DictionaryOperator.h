@@ -8,8 +8,6 @@
 #ifndef DICTIONARYOPERATOR_H
 #define	DICTIONARYOPERATOR_H
 
-#include <string>
-
 class DictionaryOperator {
 public:
     DictionaryOperator();
